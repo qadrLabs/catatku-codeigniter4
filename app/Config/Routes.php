@@ -7,6 +7,13 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->get('/', 'Home::index');
+
+$routes->group('', ['filter' => 'guest'], static function ($routes) {
+    $routes->get('/register', 'AuthController::showRegister');
+    $routes->post('/register', 'AuthController::register');
+});
+
+
 $routes->get('/entries', 'EntryController::index');
 
 $routes->group('', ['filter' => 'auth'], static function ($routes) {
@@ -16,12 +23,6 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/entries/(:num)/edit', 'EntryController::edit/$1');
     $routes->post('/entries/(:num)/update', 'EntryController::update/$1');
     $routes->post('/entries/(:num)/delete', 'EntryController::destroy/$1');
-});
-
-// ONLY FOR DEVELOPMENT - delete after lesson 10
-$routes->get('/dev-login', static function () {
-    session()->set(['user_id' => 1, 'user_name' => 'Budi']);
-    return redirect()->to('/entries');
 });
 
 
