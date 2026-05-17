@@ -17,4 +17,20 @@ class EntryController extends BaseController
         return view('entries/index', ['entries' => $entries]);
     }
 
+    public function show($id)
+    {
+        $entryModel = model(EntryModel::class);
+        $entry = $entryModel->find($id);
+
+        if (!$entry) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        if ( (int) $entry->user_id !== (int) session()->get('user_id')) {
+            return $this->response->setStatusCode(403, 'Forbidden');
+        }
+
+        return view('entries/show', ['entry' => $entry]);
+    }
+
 }
