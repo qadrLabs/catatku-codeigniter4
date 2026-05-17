@@ -17,6 +17,33 @@ class EntryController extends BaseController
         return view('entries/index', ['entries' => $entries]);
     }
 
+    public function create()
+    {
+        return view('entries/create');
+    }
+
+    public function store()
+    {
+        $rules = [
+            'title'   => 'required|max_length[255]',
+            'content' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $entryModel = model(EntryModel::class);
+        $entryModel->insert([
+            'user_id' => session()->get('user_id'),
+            'title'   => $this->request->getPost('title'),
+            'content' => $this->request->getPost('content'),
+        ]);
+
+        return redirect()->to('/entries')->with('success', 'Entry saved successfully.');
+    }
+
+
     public function show($id)
     {
         $entryModel = model(EntryModel::class);
