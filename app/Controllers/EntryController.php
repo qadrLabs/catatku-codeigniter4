@@ -46,6 +46,50 @@ class EntryController extends BaseController
 
     public function show($id)
     {
+        $entry = $this->findOwnedEntry($id);
+        return view('entries/show', ['entry' => $entry]);
+    }
+
+    public function edit($id)
+    {
+        $entry = $this->findOwnedEntry($id);
+        return view('entries/edit', ['entry' => $entry]);
+    }
+
+    public function update($id)
+    {
+        $entry = $this->findOwnedEntry($id);
+
+        $rules = [
+            'title'   => 'required|max_length[255]',
+            'content' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $entryModel = model(EntryModel::class);
+        $entryModel->update($id, [
+            'title'   => $this->request->getPost('title'),
+            'content' => $this->request->getPost('content'),
+        ]);
+
+        return redirect()->to('/entries/' . $id)->with('success', 'Entry updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $entry = $this->findOwnedEntry($id);
+
+        $entryModel = model(EntryModel::class);
+        $entryModel->delete($id);
+
+        return redirect()->to('/entries')->with('success', 'Entry deleted successfully.');
+    }
+
+    private function findOwnedEntry($id)
+    {
         $entryModel = model(EntryModel::class);
         $entry = $entryModel->find($id);
 
@@ -54,10 +98,11 @@ class EntryController extends BaseController
         }
 
         if ( (int) $entry->user_id !== (int) session()->get('user_id')) {
-            return $this->response->setStatusCode(403, 'Forbidden');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
-        return view('entries/show', ['entry' => $entry]);
+        return $entry;
     }
+
 
 }

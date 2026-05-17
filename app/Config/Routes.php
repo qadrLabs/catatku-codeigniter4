@@ -13,6 +13,9 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/entries/create', 'EntryController::create');
     $routes->post('/entries', 'EntryController::store');
     $routes->get('/entries/(:num)', 'EntryController::show/$1');
+    $routes->get('/entries/(:num)/edit', 'EntryController::edit/$1');
+    $routes->post('/entries/(:num)/update', 'EntryController::update/$1');
+    $routes->post('/entries/(:num)/delete', 'EntryController::destroy/$1');
 });
 
 // ONLY FOR DEVELOPMENT - delete after lesson 10
